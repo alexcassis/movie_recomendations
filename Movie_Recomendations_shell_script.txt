@@ -1,0 +1,67 @@
+sudo useradd hduser
+hdfs dfs -mkdir /hackerday_ratings
+sudo usermod -G hadoop hduser
+id hduser
+sudo passwd hduser
+hdfs dfs -chown -R hduser:hadoop /hackerday_ratings
+
+wget http://files.grouplens.org/datasets/movielens/ml-1m.zip
+wget http://files.grouplens.org/datasets/movielens/ml-100k.zip
+wget http://files.grouplens.org/datasets/movielens/ml-latest.zip
+
+unzip ml-100k.zip
+unzip ml-1m.zip
+unzip ml-latest.zip
+
+hdfs dfs -mkdir /hackerday_ratings/100k
+hdfs dfs -mkdir /hackerday_ratings/million
+hdfs dfs -mkdir /hackerday_ratings/latest
+
+mv ml-100k 100k
+mv ml-1m million
+mv  ml-latest latest
+
+hdfs dfs -mkdir /hackerday_ratings/100k/data
+hdfs dfs -mkdir /hackerday_ratings/100k/item
+hdfs dfs -mkdir /hackerday_ratings/100k/info
+hdfs dfs -mkdir /hackerday_ratings/100k/genre
+hdfs dfs -mkdir /hackerday_ratings/100k/user
+hdfs dfs -mkdir /hackerday_ratings/100k/occupation
+hdfs dfs -copyFromLocal /home/hadoop/100k/u.data /hackerday_ratings/100k/data
+hdfs dfs -copyFromLocal /home/hadoop/100k/u.item /hackerday_ratings/100k/item
+hdfs dfs -copyFromLocal /home/hadoop/100k/u.info /hackerday_ratings/100k/info
+hdfs dfs -copyFromLocal /home/hadoop/100k/u.genre /hackerday_ratings/100k/genre
+hdfs dfs -copyFromLocal /home/hadoop/100k/u.user /hackerday_ratings/100k/user
+hdfs dfs -copyFromLocal /home/hadoop/100k/u.data /hackerday_ratings/100k/occupation
+
+wget https://s3.amazonaws.com/hackerday.bigdata/37/hive-serdes-1.0-SNAPSHOT.jar
+wget https://s3.amazonaws.com/hackerday.bigdata/37/flume-sources-1.0-SNAPSHOT.jar
+
+wget https://github.com/downloads/ogrodnek/csv-serde/csv-serde-1.1.2.jar
+
+hdfs dfs -copyFromLocal /home/hadoop/csv-serde-1.1.2.jar  /hackerday_ratings/
+
+sed 's/::/@/g' ratings > ratings_clean 
+hdfs dfs -mkdir /hackerday_ratings/million/ratings
+hdfs dfs -copyFromLocal /home/hadoop/million/ratings_clean /hackerday_ratings/million/ratings
+
+sed 's/::/@/g' users > users_clean
+hdfs dfs -mkdir /hackerday_ratings/million/users
+hdfs dfs -copyFromLocal /home/hadoop/million/users_clean /hackerday_ratings/million/users
+
+sed 's/::/@/g' movies > movies_clean 
+hdfs dfs -mkdir /hackerday_ratings/million/movies
+hdfs dfs -copyFromLocal /home/hadoop/million/movies_clean /hackerday_ratings/million/movies
+
+hdfs dfs -mkdir /hackerday_ratings/latest/ratings
+hdfs dfs -mkdir /hackerday_ratings/latest/links
+hdfs dfs -mkdir /hackerday_ratings/latest/movies
+hdfs dfs -mkdir /hackerday_ratings/latest/tags
+hdfs dfs -mkdir /hackerday_ratings/latest/scores
+
+hdfs dfs -copyFromLocal /home/hadoop/latest/ratings.csv /hackerday_ratings/latest/ratings
+hdfs dfs -copyFromLocal /home/hadoop/latest/links.csv /hackerday_ratings/latest/links
+hdfs dfs -copyFromLocal /home/hadoop/latest/movies.csv /hackerday_ratings/latest/movies
+hdfs dfs -copyFromLocal /home/hadoop/latest/tags.csv /hackerday_ratings/latest/tags
+
+

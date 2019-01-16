@@ -1,0 +1,61 @@
+1) WHICH YEAR HAS THE MOST NO OF RATINGS
+ 
+select year(from_unixtime(rating_time)) rating_year,count(*) as cnt
+from latest_ratings 
+group by year(from_unixtime(rating_time))
+order by rating_year DESC
+
+2) TOP RATED MOVIE IN EACH YEAR
+This can be achieved by average ratings
+average ratings = Sum of ratings / count (user ID)
+ Note: 
+	* Same user might have reviewed multiple times. This is the reason user should be distinct
+	* Usually for one movie we would be asked to rate once
+	* If everyone is getting average rating as 5.0 then we have a problem. It could be that particular
+          movies would have been rated less. We might also get every rating as 5. we can have an having
+	  condition where it would be greater than 500
+        * we need to join with latest movies table to get the movie name
+        * To get the top rated movie we would be using the ranking function where ranking =1
+
+select a.rating_year,b.title, a.avg_rating 
+from (
+select movie_id 
+, cast(sum(rating) as double)/count(distinct user_id) avg_rating 
+, year(from_unixtime(rating_time)) 
+, rank() over (partition by year(from_unixtime(rating_time)) 
+order by cast(sum(rating) as double)/count(distinct user_id) desc) ranking
+from latest_ratings
+group by movie_id, year(from_unixtime(rating_time))
+having count(distinct user_id) > 500 ) a
+join latest_movies b
+ON a.movie_id = b.movie_id
+WHERE a.ranking = 1
+     
+	
+
+3) EVERY YEAR HAVING A MOVIE WHICH HAS MAX USERS
+   Every year for any movie id what is the max users (How many users has rated that movie in the particular year)
+
+CREATE TABLE tmp_movie_max_users_yearly 
+AS
+SELECT b.movie_id, MAX(c.rating_year) myear,b.max_year
+(SELECT movie_id, MAX(user_count) max_users
+FROM (
+SELECT movie_id 
+, YEAR(from_unixtime(rating_time)) 
+, COUNT(DISTINCT user_id) user_count
+FROM latest_ratings
+GROUP BY movie_id, YEAR(from_unixtime(rating_time))) a
+GROUP BY movie_id ) b
+JOIN 
+( SELECT movie_id 
+, YEAR(from_unixtime(rating_time)) 
+, COUNT(DISTINCT user_id) user_count
+FROM latest_ratings
+GROUP BY movie_id, YEAR(from_unixtime(rating_time))) c
+ON b.movie_id = c.movie_id
+AND b.max_users = c.user_count
+GROUP BY b.movie_id,b.max_users;
+
+   
+
