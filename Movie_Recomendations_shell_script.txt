@@ -1,3 +1,13 @@
+
+--CREATE A DIRECTORY UNDER HOME
+--NOTE: CLOUDERA INSTALLATION WOULD HAVE A FOLDER ALREADY CREATED UNDER HOME.
+      : iF FOLDER IS NOT CREATED THEN CREATE A FOLDER
+cd /home
+sudo mkdir hadoop
+cd hadoop
+--PROVIDE READ AND WRITE PERMISSIONS FOR THE DIRECTORY
+sudo chmod -R 777 /home/hadoop/
+
 sudo useradd hduser
 hdfs dfs -mkdir /hackerday_ratings
 sudo usermod -G hadoop hduser
@@ -5,28 +15,36 @@ id hduser
 sudo passwd hduser
 hdfs dfs -chown -R hduser:hadoop /hackerday_ratings
 
+--FETCH THE FILES
 wget http://files.grouplens.org/datasets/movielens/ml-1m.zip
 wget http://files.grouplens.org/datasets/movielens/ml-100k.zip
 wget http://files.grouplens.org/datasets/movielens/ml-latest.zip
 
+--UNZIP THE FILES
 unzip ml-100k.zip
 unzip ml-1m.zip
 unzip ml-latest.zip
 
+--MAKE DIRECTORIES FOR 100 , MILLION LATEST
 hdfs dfs -mkdir /hackerday_ratings/100k
 hdfs dfs -mkdir /hackerday_ratings/million
 hdfs dfs -mkdir /hackerday_ratings/latest
 
+--RENAME FILE NAMES
 mv ml-100k 100k
 mv ml-1m million
 mv  ml-latest latest
 
+--MAKE DIRECTORY IN HDFS FOR 100K RECORDS
 hdfs dfs -mkdir /hackerday_ratings/100k/data
 hdfs dfs -mkdir /hackerday_ratings/100k/item
 hdfs dfs -mkdir /hackerday_ratings/100k/info
 hdfs dfs -mkdir /hackerday_ratings/100k/genre
 hdfs dfs -mkdir /hackerday_ratings/100k/user
 hdfs dfs -mkdir /hackerday_ratings/100k/occupation
+
+
+--COPY FROM LOCAL TO HDFS
 hdfs dfs -copyFromLocal /home/hadoop/100k/u.data /hackerday_ratings/100k/data
 hdfs dfs -copyFromLocal /home/hadoop/100k/u.item /hackerday_ratings/100k/item
 hdfs dfs -copyFromLocal /home/hadoop/100k/u.info /hackerday_ratings/100k/info
@@ -34,13 +52,24 @@ hdfs dfs -copyFromLocal /home/hadoop/100k/u.genre /hackerday_ratings/100k/genre
 hdfs dfs -copyFromLocal /home/hadoop/100k/u.user /hackerday_ratings/100k/user
 hdfs dfs -copyFromLocal /home/hadoop/100k/u.data /hackerday_ratings/100k/occupation
 
+
+--GET THE SERDE AND SNAPSHOT JAR FILE
 wget https://s3.amazonaws.com/hackerday.bigdata/37/hive-serdes-1.0-SNAPSHOT.jar
 wget https://s3.amazonaws.com/hackerday.bigdata/37/flume-sources-1.0-SNAPSHOT.jar
-
 wget https://github.com/downloads/ogrodnek/csv-serde/csv-serde-1.1.2.jar
 
+--COPY THE SERDE JAR FILE TO HDFS
 hdfs dfs -copyFromLocal /home/hadoop/csv-serde-1.1.2.jar  /hackerday_ratings/
 
+--RENAME DAT FILES
+mv movies.dat movies
+mv ratings.dat ratings
+mv users.dat users
+mv movies.dat movies
+mv ratings.dat ratings
+mv users.dat users
+
+--REPLACE "--" WITH "@"
 sed 's/::/@/g' ratings > ratings_clean 
 hdfs dfs -mkdir /hackerday_ratings/million/ratings
 hdfs dfs -copyFromLocal /home/hadoop/million/ratings_clean /hackerday_ratings/million/ratings
@@ -50,7 +79,8 @@ hdfs dfs -mkdir /hackerday_ratings/million/users
 hdfs dfs -copyFromLocal /home/hadoop/million/users_clean /hackerday_ratings/million/users
 
 sed 's/::/@/g' movies > movies_clean 
-hdfs dfs -mkdir /hackerday_ratings/million/movies
+hdfs dfs -mk
+dir /hackerday_ratings/million/movies
 hdfs dfs -copyFromLocal /home/hadoop/million/movies_clean /hackerday_ratings/million/movies
 
 hdfs dfs -mkdir /hackerday_ratings/latest/ratings
