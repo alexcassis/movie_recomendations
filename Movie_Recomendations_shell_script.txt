@@ -65,22 +65,19 @@ hdfs dfs -copyFromLocal /home/hadoop/csv-serde-1.1.2.jar  /hackerday_ratings/
 mv movies.dat movies
 mv ratings.dat ratings
 mv users.dat users
-mv movies.dat movies
-mv ratings.dat ratings
-mv users.dat users
+
 
 --REPLACE "--" WITH "@"
-sed 's/::/@/g' ratings > ratings_clean 
+sed 's/::/@/g' /home/hadoop/million/ratings > /home/hadoop/million/ratings_clean 
 hdfs dfs -mkdir /hackerday_ratings/million/ratings
 hdfs dfs -copyFromLocal /home/hadoop/million/ratings_clean /hackerday_ratings/million/ratings
 
-sed 's/::/@/g' users > users_clean
+sed 's/::/@/g' /home/hadoop/million/users > /home/hadoop/million/users_clean 
 hdfs dfs -mkdir /hackerday_ratings/million/users
 hdfs dfs -copyFromLocal /home/hadoop/million/users_clean /hackerday_ratings/million/users
 
-sed 's/::/@/g' movies > movies_clean 
-hdfs dfs -mk
-dir /hackerday_ratings/million/movies
+sed 's/::/@/g' /home/hadoop/million/movies > /home/hadoop/million/movies_clean 
+hdfs dfs -mkdir /hackerday_ratings/million/movies
 hdfs dfs -copyFromLocal /home/hadoop/million/movies_clean /hackerday_ratings/million/movies
 
 hdfs dfs -mkdir /hackerday_ratings/latest/ratings
