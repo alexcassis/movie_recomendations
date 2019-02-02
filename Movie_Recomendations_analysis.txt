@@ -187,19 +187,28 @@ select c.rating_year,
         from latest_movies; 
 
 JOIN LATEST RATINGS AND LATEST ITEMS
-  create table tmp_movies_rel_usrs AS
-  select c.movie_id, max(c.user_counts) max_user_count
-  from 
-  (select movie_id,year(from_unixtime(rating_time)) rating_year,count(distinct user_id) user_counts
-        from latest_ratings a
-        join (select distinct movie_id,release_year,release_year+ 1 next_year
-        from latest items
-             where release_year > 1994) b
-     on a.movie_id =b.movie_id 
-	where year(from_unixtime(rating_time)) =b.release_year  or year(from_unixtime(rating_time)) =b.next_year
-	group by a.movie_id,year(from_unixtime(a.rating_time))
-        having user_counts > 500 ) c
-        group by c.movie_id
+  create table tmp_movies_rel_usrs 
+as 
+ select c.movie_id, 
+        max(c.user_counts) max_user_count 
+ 	from (select a.movie_id,
+              year(from_unixtime(a.rating_time)) rating_year,
+              count(distinct a.user_id) user_counts 
+     	from latest_ratings a 
+     	join (select distinct movie_id,
+                           release_year,
+                           release_year+ 1  next_years
+                   from latest_items 
+                   where release_year > 1994
+           ) b 
+    	on a.movie_id =b.movie_id 
+    	where (year(from_unixtime(rating_time))    =b.release_year
+              or year(from_unixtime(rating_time)) =b.next_years)
+              group by a.movie_id,year(from_unixtime(a.rating_time)) 
+              having user_counts > 500
+          ) c 
+    group by c.movie_id
+
 
  AFTER 5 YEARS
   create table tmp_movies_rel_later_usrs AS
