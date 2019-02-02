@@ -188,10 +188,45 @@ MOVIE WHICH HAS BEEN RATED 50% MORE AFTER 5 YEARS FROM THE RELEASE
 NOW WE NEED TO CALCULATE THE PERCENTAGE CHANGE FROM THE YEARS
     we NEED TO PULL OUT THE MAX CHANGES ANY YEAR
     WHEREVER WE FIND THE CHANGES GREATER THAN 100%
-
-	select * from tmp_movie_rel_users a
+        select * from 
+	(select a.movie_id,d.movie_title,c.rating_year,c.percentage_change,
+        rank () over (partition by c.movie_id order by c.percentage_change desc) ranking
+	(select a.movie_id,b.rating_year, cast(user_counts - max_user_count) * 100 percentage_change
+                 as double)/max_user_count  
+                 from tmp_movie_rel_users a
 		 join tmp_movie_rel_later_users  b
          	 on a.movie_id = b.movie_id
+		 where (cast((user_counts -max_user_count) as DOUBLE)/max_user_count) >=1) c
+		 join latest_items d
+                 on c.movie_id=d.movie_id
+	) e
+	 where e.ranking =1
+         order by movie title limit 100
+
+ 6)OVER LAST 10 YEARS WHICH GENRE HAS SEEN MAXIMUM DECLINE IN MAKING MOVIES EACH YEAR
+
+      select movie_id,title,genres 
+	from latest_movies lateral view explode(split(genre, "\\| ")) asTable as generes where movie_id in (1,2) limit 10
+
+       select genres as genre,count(distinct movie_id) mov 
+	from latest_movies lateral view explode(split(genre, "\\| ")) asTable as generes where movie_id in (1,2) limit 10
+	group by genres
+	order by genres limit 10
+        
+	--This query would not work
+        select genres as genre,count(distinct movie_id) mov 
+	from latest_movies lateral view explode(split(genre, "\\| ")) asTable as generes where movie_id in (1,2) limit 10
+	group by 1
+	order by 1 limit 10
+	--We need to set hive properties
+	
+	set hive.groupby.orderby.position.alias=true;
+
+
+
+
+
+        
 
 
     
