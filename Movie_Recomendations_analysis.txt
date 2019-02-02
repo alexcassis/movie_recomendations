@@ -92,28 +92,51 @@ on b.movie_id = c.movie_id
 and b.max_users = c.user_count 
 group by b.movie_id,b.max_users;
 
+	193819  2018    1
+	193821  2018    3
+	193823  2018    1
+	193825  2018    1
+	193827  2018    1
+	193829  2018    1
+	193833  2018    1
+	193835  2018    1
+	193837  2018    1
+	193839  2018    1
+	193841  2018    1
+	193843  2018    1
+	193845  2018    1
+	193849  2018    2
+	193851  2018    1
+    	193853  2018    1
+	193855  2018    1
+        193857  2018    1
+        193859  2018    1
+        193861  2018    1
+
+
 
 4) JOIN THE TABLE WHICH HAS MAX USERS EVERY YEAR FOR A MOVIE WITH TOP RATED MOVIES IN EACH YEAR
-    
-select c.rating_year,c.title, c.avg_rating 
-	from (
-		select a.movie_id 
-		, cast(sum(a.rating) as double)/count(distinct a.user_id) avg_rating 
-		, year(from_unixtime(a.rating_time)) rating_year
-		, rank() over (partition by year(from_unixtime(rating_time)) 
-		 	order by cast(sum(a.rating) as double)/count(distinct a.user_id) desc) ranking
-		from latest_ratings a 
-		group by movie_id, year(from_unixtime(rating_time))
-		join  tmp_movie_max_users_yearly  b 
-		  on a.movie_id=b.movie_id	
-		  and year(from_unixtime(rating_time)) = b.myear
-		group by a.movie_id,year(from_unixtime(a.rating_time))
-	        having count(distinct user_id) > 100
-	    ) c
-	join latest_movies d
-	on c.movie_id = d.movie_id
-	where c.ranking = 1 
-        order by c.rating_year
+ 
+select c.rating_year, 
+       d.title, 
+       c.avg_rating 
+     from ( select a.movie_id , 
+                 cast(sum(a.rating) as double)/count(distinct a.user_id) avg_rating , 
+                 year(from_unixtime(a.rating_time)) rating_year , 
+                 rank() over (partition by year(from_unixtime(a.rating_time)) 
+                 order by cast(sum(a.rating) as double)/count(distinct a.user_id) desc) ranking 
+              from latest_ratings a 
+             join  tmp_movie_max_users_yearly  b 
+             on a.movie_id=b.movie_id 
+            and year(from_unixtime(a.rating_time)) = b.myear 
+            group by a.movie_id,year(from_unixtime(a.rating_time)) 
+            having count(distinct a.user_id) > 100 
+           ) c 
+      join latest_movies d 
+      on c.movie_id = d.movie_id 
+     where c.ranking = 1 
+    order by c.rating_year;
+
    
 
 
@@ -122,7 +145,6 @@ select c.rating_year,c.title, c.avg_rating
      * We need to have 5 years of movie data from thier release date
 
     SD -    2005 : 10000 - 4.2   - (10/12)=.83  (4.2 * .83) =3.4986
-        
     Ikuri - 2005 : 6000  - 4.366 - (60/12) =.5  (4.366 * .50) =3.183
 
     *Our target is to have a movie release date 
