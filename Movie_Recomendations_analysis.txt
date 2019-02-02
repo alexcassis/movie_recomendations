@@ -1,12 +1,3 @@
-Calculate moving average
-city,store,product,no_items
-how do you implement in hive
-Hadoop version 1 and 2
-submiting hive job . how it is doing in 1 version and 2 version
-block size .How it would make it located
-
-Arvind muruli perfecient
-
 1) WHICH YEAR HAS THE MOST NO OF RATINGS
  
 select year(from_unixtime(rating_time)) rating_year,count(*) as cnt
