@@ -41,6 +41,30 @@ average ratings = Sum of ratings / count (user ID)
       on a.movie_id = b.movie_id 
       where a.ranking = 1 
       order by a.rating_year
+
+	1996    Schindler's List (1993) 4.514696276943174
+	1997    Wallace & Gromit: The Wrong Trousers (1993)     4.5112903225806456
+	1998    Saving Private Ryan (1998)      4.480701754385965
+	1999    "Godfather      4.544752645124392
+	2000    "Shawshank Redemption   4.553487376979033
+	2001    "Shawshank Redemption   4.584341906202723
+	2002    "Usual Suspects 4.589861751152074
+	2003    "Shawshank Redemption   4.495418448381185
+	2004    "Shawshank Redemption   4.3772394136807815
+	2005    "Shawshank Redemption   4.3538953621201735
+	2006    "Shawshank Redemption   4.390079103493737
+	2007    "Shawshank Redemption   4.396220472440945
+	2008    "Shawshank Redemption   4.435086810054418
+	2009    "Shawshank Redemption   4.44210722263589
+	2010    "Shawshank Redemption   4.432236376503893
+	2011    "Shawshank Redemption   4.45922131147541
+	2012    "Shawshank Redemption   4.408857509627728
+	2013    "Shawshank Redemption   4.437730287398674
+	2014    "Shawshank Redemption   4.3894086826347305
+	2015    "Shawshank Redemption   4.392230338677545
+	2016    "Shawshank Redemption   4.3361185383244205
+	2017    Planet Earth (2006)     4.4364844903988185
+	2018    "Shawshank Redemption   4.35815356065878
  
 3) EVERY YEAR HAVING A MOVIE WHICH HAS MAX USERS
    * Every year for any movie id what is the max users (How many users has rated that movie in the particular year)
