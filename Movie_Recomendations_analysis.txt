@@ -73,25 +73,24 @@ average ratings = Sum of ratings / count (user ID)
 
 create table tmp_movie_max_users_yearly 
 as
-select b.movie_id, max(c.rating_year) myear,b.max_year
-       (select movie_id, max(user_count) max_users
-	from (
-		select movie_id 
-		, year(from_unixtime(rating_time)) rating_year
-		, count(distinct user_id) user_count
-		from latest_ratings
-		group by movie_id, year(from_unixtime(rating_time))) a
-		group by movie_id 
-	 ) b
-  join
-	( select movie_id 
-	, year(from_unixtime(rating_time)) rating_year
-	, count(distinct user_id) user_count
-	from latest_ratings
-	group by movie_id, year(from_unixtime(rating_time))) c
-	on b.movie_id = c.movie_id
-	and b.max_users = c.user_count
-	group by b.movie_id,b.max_users;
+select b.movie_id, 
+       max(c.rating_year) myear, 
+       b.max_users from 
+         (select movie_id, 
+          max(user_count) max_users 
+          from ( select movie_id , year(from_unixtime(rating_time)) rating_year , 
+                 count(distinct user_id) user_count 
+                 from latest_ratings 
+                 group by movie_id, year(from_unixtime(rating_time))) a 
+           group by movie_id ) b 
+join (select movie_id , 
+             year(from_unixtime(rating_time)) rating_year , 
+             count(distinct user_id) user_count 
+             from latest_ratings group by movie_id, 
+                  year(from_unixtime(rating_time))) c 
+on b.movie_id = c.movie_id 
+and b.max_users = c.user_count 
+group by b.movie_id,b.max_users;
 
 
 4) JOIN THE TABLE WHICH HAS MAX USERS EVERY YEAR FOR A MOVIE WITH TOP RATED MOVIES IN EACH YEAR
