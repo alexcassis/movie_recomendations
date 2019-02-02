@@ -79,7 +79,7 @@ hdfs dfs -copyFromLocal /home/hadoop/million/users_clean /hackerday_ratings/mill
 
 sed 's/::/@/g' /home/hadoop/million/movies > /home/hadoop/million/movies_clean 
 hdfs dfs -mkdir /hackerday_ratings/million/movies
-hdfs dfs -copyFromLocal /home/hadoop/million/movies_clean /hackerday_ratings/million/movies\\
+hdfs dfs -copyFromLocal /home/hadoop/million/movies_clean /hackerday_ratings/million/movies
 
 --CREATE DIRECTORIES FOR LATEST
 hdfs dfs -mkdir /hackerday_ratings/latest/ratings

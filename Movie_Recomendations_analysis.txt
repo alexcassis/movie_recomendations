@@ -26,20 +26,21 @@ average ratings = Sum of ratings / count (user ID)
         * we need to join with latest movies table to get the movie name
         * To get the top rated movie we would be using the ranking function where ranking =1
 
-select a.rating_year,b.title, a.avg_rating 
-	from (
-		select movie_id 
-		, cast(sum(rating) as double)/count(distinct user_id) avg_rating 
-		, year(from_unixtime(rating_time)) 
-		, rank() over (partition by year(from_unixtime(rating_time)) 
-		order by cast(sum(rating) as double)/count(distinct user_id) desc) ranking
-		from latest_ratings 
-		group by movie_id, year(from_unixtime(rating_time))
-		having count(distinct user_id) > 500 ) a
-	join latest_movies b
-        on a.movie_id = b.movie_id
-	where a.ranking = 1 
-        sort by a.rating_year
+ select a.rating_year,
+       b.title, 
+       a.avg_rating 
+      from (select movie_id , 
+                   cast(sum(rating) as double)/count(distinct user_id) avg_rating , 
+                   year(from_unixtime(rating_time)) rating_year, 
+                   rank() over (partition by year(from_unixtime(rating_time)) 
+                          order by cast(sum(rating) as double)/count(distinct user_id) desc) 
+                    ranking from latest_ratings 
+                    group by movie_id, year(from_unixtime(rating_time)) 
+                    having count(distinct user_id) > 500 ) a 
+      join latest_movies b 
+      on a.movie_id = b.movie_id 
+      where a.ranking = 1 
+      order by a.rating_year
  
 3) EVERY YEAR HAVING A MOVIE WHICH HAS MAX USERS
    * Every year for any movie id what is the max users (How many users has rated that movie in the particular year)

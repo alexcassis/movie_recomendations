@@ -72,7 +72,6 @@ age tinyint,
 gender varchar(5),
 occupation varchar(100),
 zipcode int
-
 )
 row format delimited
 fields terminated by '|'
@@ -112,7 +111,6 @@ fields terminated by '@'
 lines terminated by '\n'
 location '/hackerday_ratings/million/users';
 
-use hackerday_ratings;
 drop table million_ratings;
 create external table million_ratings (
 user_id int,
