@@ -3,7 +3,7 @@
 select year(from_unixtime(rating_time)) rating_year,count(*) as cnt
 from latest_ratings 
 group by year(from_unixtime(rating_time))
-order by rating_year DESC;
+order by rating_year DESC
 
 2) TOP RATED MOVIE IN EACH YEAR
 This can be achieved by average ratings
@@ -31,7 +31,7 @@ average ratings = Sum of ratings / count (user ID)
       join latest_movies b 
       on a.movie_id = b.movie_id 
       where a.ranking = 1 
-      order by a.rating_year;
+      order by a.rating_year
 
 	1996    Schindler's List (1993) 4.514696276943174
 	1997    Wallace & Gromit: The Wrong Trousers (1993)     4.5112903225806456
@@ -127,32 +127,10 @@ select c.rating_year,
       on c.movie_id = d.movie_id 
      where c.ranking = 1 
     order by c.rating_year;
-    
-    	1996    Schindler's List (1993) 4.514696276943174
-	1997    Star Wars: Episode IV - A New Hope (1977)       4.268936690794169
-	1998    Money Talks (1997)      2.9597701149425286
-	1999    World of Apu, The (Apur Sansar) (1959)  4.510989010989011
-	2000    Wallace & Gromit: A Close Shave (1995)  4.504720406681191
-	2001    Sweet Smell of Success (1957)   4.288135593220339
-	2002    Z (1969)        4.175438596491228
-	2003    Europa Europa (Hitlerjunge Salomon) (1990)      4.11734693877551
-	2004    To Have and Have Not (1944)     4.090686274509804
-	2005    Ikiru (1952)    4.366071428571429
-	2006    Why We Fight (2005)     4.016981132075472
-	2007    Hearts of Darkness: A Filmmakers Apocalypse (1991)      4.065934065934066
-	2008    49 Up (2005)    4.05607476635514
-	2009    Seven Up! (1964)        4.085987261146497
-	2010    Decalogue, The (Dekalog) (1989) 4.208333333333333
-	2011    BURN-E (2008)   3.9066390041493775
-	2012    The Artist (2011)       3.928813559322034
-	2013    Game Change (2012)      3.772277227722772
-	2014    Philomena (2013)        3.853395061728395
-	2015    Fight Club (1999)       4.290882315277244
-	2016    The Blue Planet (2001)  4.328313253012048
-	2017    Planet Earth II (2016)  4.4929292929292926
-	2018    The Godfather Trilogy: 1972-1990 (1992) 4.343939393939394
 
-  
+   
+
+
    5)WHICH MOVIE HAS BEEN RATED 50% MORE AFTER 5 YEARS FROM THIER RELEASE + NEXT YEAR
      * We need to have the release date
      * We need to have 5 years of movie data from thier release date
@@ -193,35 +171,20 @@ select c.rating_year,
                  from million_movies limit 10
 
         7)
-	  create table latest_items as
-		select distinct movie_id,title,
-     		case
-		when instr(reverse(title),'(') =0
-		then ''
-		when substring(title,instr((title), '('+1,4) between 1900 and 2020
-                then substring(title,instr((title), '('+1,4)
-		when substring(title,instr((title), '('+1,4) not between '1900' and '2020'
-                then substring(title,instr((title), '('+1,4) and
-                     substring(title, length(title)'('+1,4) - instr(reverse(title)), '('+2,4)
-                     not between '1900' and '2020'
-                then ' '
-                else
-                     substring(title, length(title)'('+1,4) - instr(reverse(title)), '('+2,4)
-                end
-                     release_year
-                from latest_movies;
-                else substring(title,length(title)
-output
-	1       Toy Story (1995)        1995
-	2       Jumanji (1995)  1995
-	3       Grumpier Old Men (1995) 1995
-	4       Waiting to Exhale (1995)        1995
-	5       Father of the Bride Part II (1995)      1995
-	6       Heat (1995)     1995
-	7       Sabrina (1995)  1995
-	8       Tom and Huck (1995)     1995
-	9       Sudden Death (1995)     1995
-	10      GoldenEye (1995)        1995
+	 create table latest_items 
+	 as select distinct movie_id,
+            title, 
+            case when instr(reverse(title),'(' ) = 0 
+                  then '' 
+               when    substring(title,instr((title), '(')+1,4) between 1900 and 2020 
+                  then substring(title,instr((title), '(')+1,4) 
+               when    substring(title,instr((title), '(')+1,4) not between '1900' and '2020' 
+                   and substring(title,length(title) - instr(reverse(title), '(')+2,4) 
+                   not between '1900' and '2020' 
+                   then ' ' 
+               else substring(title, length(title) - instr(reverse(title), '(')+2,4) 
+               end release_year 
+        from latest_movies; 
 
 JOIN LATEST RATINGS AND LATEST ITEMS
   create table tmp_movies_rel_usrs AS
