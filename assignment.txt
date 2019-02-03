@@ -1,0 +1,20 @@
+OVER LAST 10 YEARS WHICH GENRE HAS SEEN MAXIMUM DECLINE IN MAKING MOVIES EACH YEAR
+
+      select movie_id,title,genres 
+	from latest_movies lateral view explode(split(genre, "\\| ")) asTable as generes where movie_id in (1,2) limit 10
+
+       select genres as genre,count(distinct movie_id) mov 
+	from latest_movies lateral view explode(split(genre, "\\| ")) asTable as generes where movie_id in (1,2) limit 10
+	group by genres
+	order by genres limit 10
+        
+	--This query would not work
+        select genres as genre,count(distinct movie_id) mov 
+	from latest_movies lateral view explode(split(genre, "\\| ")) asTable as generes where movie_id in (1,2) limit 10
+	group by 1
+	order by 1 limit 10
+	--We need to set hive properties
+	
+	set hive.groupby.orderby.position.alias=true;
+
+

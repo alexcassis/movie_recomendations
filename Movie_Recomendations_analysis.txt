@@ -1,11 +1,14 @@
+***************************************************************
 1) WHICH YEAR HAS THE MOST NO OF RATINGS
- 
+***************************************************************
 select year(from_unixtime(rating_time)) rating_year,count(*) as cnt
 from latest_ratings 
 group by year(from_unixtime(rating_time))
 order by rating_year DESC
 
+*****************************************************************
 2) TOP RATED MOVIE IN EACH YEAR
+****************************************************************
 This can be achieved by average ratings
 average ratings = Sum of ratings / count (user ID)
  Note: 
@@ -56,8 +59,10 @@ average ratings = Sum of ratings / count (user ID)
 	2016    "Shawshank Redemption   4.3361185383244205
 	2017    Planet Earth (2006)     4.4364844903988185
 	2018    "Shawshank Redemption   4.35815356065878
- 
+
+****************************************************************
 3) EVERY YEAR HAVING A MOVIE WHICH HAS MAX USERS
+*****************************************************************
    * Every year for any movie id what is the max users (How many users has rated that movie in the particular year)
    * We need every year from 1
    * We would match the year rating with movie_id and max users with user count
@@ -104,9 +109,9 @@ group by b.movie_id,b.max_users;
         193859  2018    1
         193861  2018    1
 
-
-
+************************************************************************************************
 4) JOIN THE TABLE WHICH HAS MAX USERS EVERY YEAR FOR A MOVIE WITH TOP RATED MOVIES IN EACH YEAR
+************************************************************************************************
  
 select c.rating_year, 
        d.title, 
@@ -128,10 +133,9 @@ select c.rating_year,
      where c.ranking = 1 
     order by c.rating_year;
 
-   
-
-
+*********************************************************************************************
    5)WHICH MOVIE HAS BEEN RATED 50% MORE AFTER 5 YEARS FROM THIER RELEASE + NEXT YEAR
+*********************************************************************************************
      * We need to have the release date
      * We need to have 5 years of movie data from thier release date
 
@@ -143,15 +147,15 @@ select c.rating_year,
      Ex : Toy Story (1995)
           In this case it starts after the parenthesis and year is 4 character. so it would be 1995
           
-     1) select substring(title, 12, 3)  from million_movies limit 10
-     2) select instr(title'(') from million_movies limit 10  
+     5.1) select substring(title, 12, 3)  from million_movies limit 10
+     5.2) select instr(title'(') from million_movies limit 10  
         Note:This might not be the best solution as movie might have parenthesis
         Sol: We need to write a function to find parenthesis.Take the length of the string after
              If the length of the string is greater than 4 then we need to consider the second
              parenthesis
          Note:we also need to consider if there is a second bracket involved
          
-     3) select distinct 
+     5.3) select distinct 
                case
                     when 
                     length(substring(title,instr(title,'(')+1,length(title))) > 5
@@ -162,15 +166,15 @@ select c.rating_year,
                     end    
                     from million_movies limit 10;
         
-       4)select substring(title,instr(reverse(title),'(')) 
+      5.4)select substring(title,instr(reverse(title),'(')) 
                  from million_movies limit 10;
-       5)select substring(title,length(title) -instr(reverse(title), '('
+      5.5)select substring(title,length(title) -instr(reverse(title), '('
                  from million_movies limit 10
-       6) select substring(title,length(title) - instr(reverse(title),
+      5.6) select substring(title,length(title) - instr(reverse(title),
           ,'('))+2,4) release_year 
                  from million_movies limit 10
 
-        7)
+      5.7)
 	 create table latest_items 
 	 as select distinct movie_id,
             title, 
@@ -185,12 +189,24 @@ select c.rating_year,
                else substring(title, length(title) - instr(reverse(title), '(')+2,4) 
                end release_year 
         from latest_movies; 
-
-JOIN LATEST RATINGS AND LATEST ITEMS
-  create table tmp_movies_rel_usrs 
-as 
- select c.movie_id, 
-        max(c.user_counts) max_user_count 
+	
+       movie_id title                  movie_year
+	1       Toy Story (1995)        1995
+	2       Jumanji (1995)  1995
+	3       Grumpier Old Men (1995) 1995
+	4       Waiting to Exhale (1995)        1995
+	5       Father of the Bride Part II (1995)      1995
+	6       Heat (1995)     1995
+	7       Sabrina (1995)  1995
+	8       Tom and Huck (1995)     1995
+	9       Sudden Death (1995)     1995
+	10      GoldenEye (1995)        1995
+      
+        5.8) JOIN LATEST RATINGS AND LATEST ITEMS
+  	create table tmp_movies_rel_usrs 
+  	as 
+  	select c.movie_id, 
+        	max(c.user_counts) max_user_count 
  	from (select a.movie_id,
               year(from_unixtime(a.rating_time)) rating_year,
               count(distinct a.user_id) user_counts 
@@ -208,28 +224,43 @@ as
               having user_counts > 500
           ) c 
     group by c.movie_id
+   
+     movie_id max_user_counts
+	4       1364
+	8       589
+	12      861
+	16      4209
+	20      1647
+	24      1755
+	28      954
+	32      11035
+	36      6071
+	44      3631
 
 
- AFTER 5 YEARS
-  create table tmp_movies_rel_later_usrs AS
-  select c.movie_id, max(c.user_counts) max_user_count
-  from 
-  (select movie_id,year(from_unixtime(rating_time)) rating_year,count(distinct user_id) user_counts
-        from latest_ratings a
-        join (select distinct movie_id,release_year,release_year+ 5  after5years
-        from latest items
-             where release_year > 0) b
-     on a.movie_id =b.movie_id 
-	where year(from_unixtime(rating_time)) > =b.after5years
-	group by a.movie_id,year(from_unixtime(a.rating_time))
-        having user_counts > 500 ) c
-        group by c.movie_id
+   5.8) RATED AFTER 5 YEARS OF RELEASE
+  	create table tmp_movies_rel_later_usrs
+	as 
+     	select a.movie_id,
+              year(from_unixtime(a.rating_time)) rating_year,
+              count(distinct a.user_id) user_counts 
+     	from latest_ratings a 
+     	join (select distinct movie_id,
+                           release_year,
+                           release_year+ 5  after5Years
+                   from latest_items 
+                   where release_year > 0
+           ) b 
+    	on a.movie_id =b.movie_id 
+    	where year(from_unixtime(rating_time))    >= b.after5Years
+             group by a.movie_id,year(from_unixtime(a.rating_time));
 
-MOVIE WHICH HAS BEEN RATED 50% MORE AFTER 5 YEARS FROM THE RELEASE
-NOW WE NEED TO CALCULATE THE PERCENTAGE CHANGE FROM THE YEARS
-    we NEED TO PULL OUT THE MAX CHANGES ANY YEAR
-    WHEREVER WE FIND THE CHANGES GREATER THAN 100%
-        select * from 
+	MOVIE WHICH HAS BEEN RATED 50% MORE AFTER 5 YEARS FROM THE RELEASE
+	NOW WE NEED TO CALCULATE THE PERCENTAGE CHANGE FROM THE YEARS
+    	we NEED TO PULL OUT THE MAX CHANGES ANY YEAR
+    	WHEREVER WE FIND THE CHANGES GREATER THAN 100%
+        
+	select * from 
 	(select a.movie_id,d.movie_title,c.rating_year,c.percentage_change,
         rank () over (partition by c.movie_id order by c.percentage_change desc) ranking
 	(select a.movie_id,b.rating_year, cast(user_counts - max_user_count) * 100 percentage_change
@@ -244,27 +275,7 @@ NOW WE NEED TO CALCULATE THE PERCENTAGE CHANGE FROM THE YEARS
 	 where e.ranking =1
          order by movie title limit 100
 
- 6)OVER LAST 10 YEARS WHICH GENRE HAS SEEN MAXIMUM DECLINE IN MAKING MOVIES EACH YEAR
-
-      select movie_id,title,genres 
-	from latest_movies lateral view explode(split(genre, "\\| ")) asTable as generes where movie_id in (1,2) limit 10
-
-       select genres as genre,count(distinct movie_id) mov 
-	from latest_movies lateral view explode(split(genre, "\\| ")) asTable as generes where movie_id in (1,2) limit 10
-	group by genres
-	order by genres limit 10
-        
-	--This query would not work
-        select genres as genre,count(distinct movie_id) mov 
-	from latest_movies lateral view explode(split(genre, "\\| ")) asTable as generes where movie_id in (1,2) limit 10
-	group by 1
-	order by 1 limit 10
-	--We need to set hive properties
-	
-	set hive.groupby.orderby.position.alias=true;
-
-
-
+ 
 
 
         
