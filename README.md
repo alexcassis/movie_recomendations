@@ -1,5 +1,5 @@
 # movie_recomendations
-![alt text](sql.png)
+![alt text](movie_recomend.png)
 ## Introduction
 GroupLens Research, which is a research group in the Department of Computer Science and Engineering at the University of Minnesota, operates a movie recommender based on collaborative filtering called MovieLens, which is the source of the data.
 This dataset (ml-latest) describes 5-star rating and free-text tagging activity from MovieLens, a movie recommendation service. It contains 22884377 ratings and 586994 tag applications across 34208 movies. These data were created by 247753 users between January 09, 1995 and January 29, 2016. This dataset was generated on January 29, 2016.
