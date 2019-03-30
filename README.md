@@ -23,6 +23,14 @@ You can also find these in my blog <a href=http://www.prathapkudupublog.com/sear
           <code>cd movie_recomendations</code> 
       </tr>
 </table>
+These files are for reference. We can use the script in these files for completing this project
+
+### Steps
+* Create the environment which includes creating hdfs folders,folder permissions and create users
+* Download data from the remote server to the cluster
+* Ingest data into hive warehouse
+* Create external tables for all entities including users, movies etc
+* Write SQl queries for analysing recomendations
 
 ### License 
 movie_recomendations is released under the MIT license:
